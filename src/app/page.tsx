@@ -15,7 +15,7 @@ export default function HomePage() {
         router.replace('/dashboard'); // Use replace instead of push
       } else {
         console.log('User not logged in, redirecting to login');
-        router.replace('/dashboard'); // Use replace instead of push(login )
+        router.replace('/login'); // Use replace instead of push
       }
     }
   }, [token, isLoading, router]);
