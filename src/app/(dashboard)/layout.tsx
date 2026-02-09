@@ -1,12 +1,27 @@
-import type { ReactNode } from "react";
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+import Sidebar from '@/components/Sidebar';
+import Navbar from '@/components/Navbar';
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <section style={{ padding: "24px" }}>
-      <header style={{ marginBottom: "24px" }}>
-        <h1>Dashboard</h1>
-      </header>
-      {children}
-    </section>
+    <div className="flex h-screen bg-gray-50">
+      {/* Sidebar */}
+      <Sidebar />
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Navbar */}
+        <Navbar />
+
+        {/* Page Content */}
+        <main className="flex-1 overflow-y-auto p-6">
+          {children}
+        </main>
+      </div>
+    </div>
   );
 }

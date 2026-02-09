@@ -1,78 +1,129 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { loginService } from "../../../services/auth/LoginServices";
-
-type LoginFormState = {
-  id: string;
-  name: string;
-  created_at: string;
-  updated_at: string;
-};
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { loginService, LoginRequest } from '@/services/auth/LoginServices';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
-  const [form, setForm] = useState<LoginFormState>({
-    id: "",
-    name: "",
-    created_at: "",
-    updated_at: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { login, token } = useAuth();
+  const router = useRouter();
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
+  // Redirect if already logged in
+  useEffect(() => {
+    if (token) {
+      console.log('Already logged in, redirecting to dashboard');
+      router.replace('/dashboard');
+    }
+  }, [token, router]);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsSubmitting(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
-      const now = new Date().toISOString();
-      await loginService({
-        id: Number(form.id),
-        name: form.name.trim(),
-        created_at: form.created_at || now,
-        updated_at: form.updated_at || now,
-      });
+      console.log('Attempting login with:', { email });
+      
+      const payload: LoginRequest = { email, password };
+      const response = await loginService(payload);
+
+      console.log('Login response:', response);
+
+      if (response.success) {
+        console.log('Login successful, calling login function');
+        // Save token and user data using AuthContext
+        login(response.data.token, response.data.user);
+      } else {
+        console.error('Login not successful:', response);
+      }
+    } catch (error) {
+      // Error is already handled by loginService with toast
+      console.error('Login error:', error);
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <main style={{ padding: "24px", maxWidth: "420px" }}>
-      <h2>Login</h2>
-      <p>Sign in to continue.</p>
-      <form onSubmit={handleSubmit} style={{ marginTop: "16px" }}>
-        <label style={{ display: "block", marginBottom: "12px" }}>
-          ID
-          <input
-            type="number"
-            name="id"
-            value={form.id}
-            onChange={handleChange}
-            required
-            style={{ display: "block", width: "100%", marginTop: "4px" }}
-          />
-        </label>
-        <label style={{ display: "block", marginBottom: "12px" }}>
-          Name
-          <input
-            type="text"
-            name="name"
-            value={form.name}
-            onChange={handleChange}
-            required
-            style={{ display: "block", width: "100%", marginTop: "4px" }}
-          />
-        </label>
-     
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Logging in..." : "Login"}
-        </button>
-      </form>
-    </main>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-xl">F</span>
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900">FieldOps HQ</h1>
+          </div>
+          <p className="text-gray-600">Login to your account</p>
+        </div>
+
+        {/* Login Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Email Input */}
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              placeholder="user@example.com"
+              disabled={isLoading}
+            />
+          </div>
+
+          {/* Password Input */}
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              placeholder="••••••••"
+              disabled={isLoading}
+            />
+          </div>
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-blue-600 text-white py-2.5 px-4 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors"
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Logging in...
+              </span>
+            ) : (
+              'Login'
+            )}
+          </button>
+        </form>
+
+        {/* Forgot Password Link */}
+        <div className="mt-6 text-center">
+          <a href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 hover:underline">
+            Forgot password?
+          </a>
+        </div>
+      </div>
+    </div>
   );
 }
