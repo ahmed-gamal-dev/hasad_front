@@ -3,18 +3,30 @@ import { toast } from "react-toastify";
 import axiosInstance from "../http/axiosInstance";
 import loginEndpoint from "./LoginEndpoint";
 
+// Update the types to match the API response from the image
 export type LoginRequest = {
+  email: string;
+  password: string;
+};
+
+export type User = {
   id: number;
   name: string;
-  created_at: string;
-  updated_at: string;
+  email: string;
+  roles: Array<{
+    id: number;
+    name: string;
+    guard_name: string;
+  }>;
 };
 
 export type LoginResponse = {
-  id: number;
-  name: string;
-  created_at: string;
-  updated_at: string;
+  success: boolean;
+  message: string;
+  data: {
+    token: string;
+    user: User;
+  };
 };
 
 const getErrorMessage = (error: unknown) => {
@@ -33,12 +45,14 @@ const getErrorMessage = (error: unknown) => {
   return "Something went wrong";
 };
 
-export const loginService = async (payload: LoginRequest) => {
+export const loginService = async (payload: LoginRequest): Promise<LoginResponse> => {
   try {
     const response = await axiosInstance.post<LoginResponse>(
       loginEndpoint,
       payload
     );
+    console.log(response);
+    
     toast.success("Logged in successfully");
     return response.data;
   } catch (error) {
