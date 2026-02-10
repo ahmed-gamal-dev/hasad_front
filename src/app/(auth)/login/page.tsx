@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { setCredentials } from '@/store/slices/authSlice';
 import { loginService, LoginRequest } from '@/services/auth/LoginServices';
 import { useRouter } from 'next/navigation';
 
@@ -9,16 +10,18 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login, token } = useAuth();
+  
+  const dispatch = useAppDispatch();
   const router = useRouter();
+  const { token, isAuthenticated } = useAppSelector((state) => state.auth);
 
   // Redirect if already logged in
   useEffect(() => {
-    if (token) {
+    if (isAuthenticated && token) {
       console.log('Already logged in, redirecting to dashboard');
       router.replace('/dashboard');
     }
-  }, [token, router]);
+  }, [isAuthenticated, token, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,9 +36,16 @@ export default function LoginPage() {
       console.log('Login response:', response);
 
       if (response.success) {
-        console.log('Login successful, calling login function');
-        // Save token and user data using AuthContext
-        login(response.data.token, response.data.user);
+        console.log('Login successful, saving to Redux');
+        
+        // Save token and user data using Redux
+        dispatch(setCredentials({
+          token: response.data.token,
+          user: response.data.user,
+        }));
+        
+        // Navigate to dashboard
+        router.push('/dashboard');
       } else {
         console.error('Login not successful:', response);
       }
@@ -53,7 +63,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">F</span>
             </div>
             <h1 className="text-2xl font-bold text-gray-900">FieldOps HQ</h1>
@@ -74,7 +84,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
               placeholder="user@example.com"
               disabled={isLoading}
             />
@@ -91,7 +101,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900"
               placeholder="••••••••"
               disabled={isLoading}
             />
@@ -101,7 +111,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-600 text-white py-2.5 px-4 rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors"
+            className="w-full bg-primary-600 text-white py-2.5 px-4 rounded-lg font-medium hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:bg-primary-300 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
@@ -119,7 +129,7 @@ export default function LoginPage() {
 
         {/* Forgot Password Link */}
         <div className="mt-6 text-center">
-          <a href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 hover:underline">
+          <a href="/forgot-password" className="text-sm text-primary-600 hover:text-primary-700 hover:underline">
             Forgot password?
           </a>
         </div>

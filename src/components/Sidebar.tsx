@@ -1,49 +1,67 @@
 'use client';
 
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { cn } from '@/lib/utils';
+import { 
+  Home, 
+  Users, 
+  Briefcase, 
+  UserCheck, 
+  FileText, 
+  Calendar, 
+  Camera, 
+  BarChart3, 
+  HelpCircle,
+  LucideIcon
+} from 'lucide-react';
 
-const menuItems = [
+interface MenuItem {
+  name: string;
+  href: string;
+  icon: LucideIcon;
+}
+
+const menuItems: MenuItem[] = [
   {
     name: 'Dashboard',
     href: '/dashboard',
-    icon: '📊',
+    icon: BarChart3,
   },
   {
     name: 'Visits',
     href: '/visits',
-    icon: '🏠',
+    icon: Home,
   },
   {
     name: 'Customers',
     href: '/customers',
-    icon: '👥',
+    icon: Users,
   },
   {
     name: 'Workers',
     href: '/workers',
-    icon: '👷',
+    icon: Briefcase,
   },
   {
     name: 'Users',
     href: '/users',
-    icon: '👤',
+    icon: UserCheck,
   },
   {
     name: 'Service Report',
     href: '/service-report',
-    icon: '📋',
+    icon: FileText,
   },
   {
     name: 'Schedule',
     href: '/schedule',
-    icon: '📅',
+    icon: Calendar,
   },
   {
     name: 'Photo Report',
     href: '/photo-report',
-    icon: '📸',
+    icon: Camera,
   },
 ];
 
@@ -51,51 +69,70 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 min-h-screen flex flex-col">
-      {/* Logo */}
-      <div className="p-6 border-b border-gray-200">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold">F</span>
+    <aside className="w-72 bg-white min-h-screen flex flex-col shadow-lg ">
+      {/* Logo Section */}
+      <div className="px-6 py-4 border-b border-primary-100">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20">
+            <span className="text-white font-bold text-xl">F</span>
           </div>
-          <span className="font-semibold text-lg text-secondary-600">FieldOps HQ</span>
+          <div className="flex flex-col">
+            <span className="font-bold text-lg text-gray-900 tracking-tight">FieldOps HQ</span>
+          </div>
         </div>
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 p-4">
-        <ul className="space-y-1">
+      <nav className="flex-1 px-4 py-6 border-r border-primary-100 overflow-y-auto">
+        <div className="space-y-1">
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
+            const Icon = item.icon;
             
             return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className={cn(
-                    'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-                    isActive
-                      ? 'bg-blue-50 text-blue-600 font-medium'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  )}
-                >
-                  <span className="text-xl">{item.icon}</span>
-                  <span>{item.name}</span>
-                </Link>
-              </li>
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`
+                  w-full flex items-center gap-3 px-4 py-3.5 rounded-xl transition-all duration-200 group
+                  ${isActive 
+                    ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-md shadow-primary-500/20' 
+                    : 'text-gray-700 hover:bg-primary-50 hover:text-primary-700'
+                  }
+                `}
+              >
+                <Icon 
+                  className={`w-5 h-5 transition-transform duration-200 ${
+                    isActive ? 'scale-110' : 'group-hover:scale-110'
+                  }`}
+                />
+                <span className={`font-medium text-sm ${isActive ? 'font-semibold' : ''}`}>
+                  {item.name}
+                </span>
+                {isActive && (
+                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                )}
+              </Link>
             );
           })}
-        </ul>
+        </div>
       </nav>
 
       {/* Help Section */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="font-semibold text-sm mb-2">Need Help?</h3>
-          <p className="text-xs text-gray-600 mb-3">
-            Contact support for any issues or questions
-          </p>
-          <button className="w-full bg-gray-800 text-white text-sm py-2 px-4 rounded-lg hover:bg-gray-900 transition-colors">
+      <div className="p-4 border-t  border-r border-primary-100">
+        <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl p-5 border border-primary-200">
+          <div className="flex items-start gap-3 mb-3">
+            <div className="w-9 h-9 bg-primary-100 rounded-lg flex items-center justify-center">
+              <HelpCircle className="w-5 h-5 text-primary-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-sm text-gray-900 mb-1">Need Help?</h3>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                Contact support for any issues or questions
+              </p>
+            </div>
+          </div>
+          <button className="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium py-2.5 px-4 rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-md shadow-primary-500/20 hover:shadow-primary-500/30 hover:scale-[1.02]">
             Contact Support
           </button>
         </div>

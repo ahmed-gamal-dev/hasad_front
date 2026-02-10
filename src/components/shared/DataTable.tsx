@@ -32,7 +32,7 @@ export default function DataTable<T extends { id: number | string }>({
     return (
       <div className="bg-white rounded-lg border border-gray-200 p-12">
         <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
       </div>
     );
@@ -49,22 +49,22 @@ export default function DataTable<T extends { id: number | string }>({
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-lg border border-primary-200 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
+          <thead className="bg-primary-50 border-b border-primary-200">
             <tr>
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider"
+                  className="px-6 py-3 text-left text-xs font-large text-primary-700  tracking-wider"
                   style={{ width: column.width }}
                 >
                   {column.label}
                 </th>
               ))}
               {(onEdit || onDelete || onView) && (
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-large text-primary-700  tracking-wider">
                   Actions
                 </th>
               )}
@@ -72,7 +72,7 @@ export default function DataTable<T extends { id: number | string }>({
           </thead>
           <tbody className="divide-y divide-gray-200">
             {data.map((item, index) => (
-              <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+              <tr key={item.id} className="hover:bg-primary-50 transition-colors">
                 {columns.map((column) => (
                   <td key={column.key} className="px-6 py-4 whitespace-nowrap">
                     {column.render
@@ -86,7 +86,7 @@ export default function DataTable<T extends { id: number | string }>({
                       {onView && (
                         <button
                           onClick={() => onView(item)}
-                          className="text-blue-600 hover:text-blue-700"
+                          className="text-primary-600 hover:text-primary-700"
                           title="View"
                         >
                           <svg

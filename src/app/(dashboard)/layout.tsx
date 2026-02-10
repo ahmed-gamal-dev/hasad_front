@@ -18,7 +18,7 @@ export default function DashboardLayout({
         <Navbar />
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 bg-white m-5 rounded-xl border border-primary-50 shadow-sm overflow-y-auto p-6">
           {children}
         </main>
       </div>
