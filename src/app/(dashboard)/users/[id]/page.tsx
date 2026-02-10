@@ -58,7 +58,7 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
   if (isLoading || userId === null) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     );
   }
@@ -78,7 +78,7 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
         <div>
           <button
             onClick={() => router.push('/users')}
-            className="text-blue-600 hover:text-blue-700 mb-2 flex items-center gap-2"
+            className="text-primary-600 hover:text-primary-700 mb-2 flex items-center gap-2"
           >
             <svg
               className="w-5 h-5"
@@ -100,7 +100,7 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
         </div>
         <button
           onClick={() => router.push(`/users/${user.id}/edit`)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
         >
           Edit User
         </button>
@@ -148,7 +148,7 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
                       ? 'bg-red-100 text-red-700'
                       : role.name === 'Technician'
                       ? 'bg-gray-100 text-gray-700'
-                      : 'bg-blue-100 text-blue-700'
+                      : 'bg-primary-100 text-primary-700'
                   }`}
                 >
                   {role.name}
@@ -170,7 +170,7 @@ export default function UserDetailsPage({ params }: UserDetailsPageProps) {
               user.permissions.map((permission) => (
                 <div
                   key={permission.id}
-                  className="px-3 py-2 bg-blue-50 text-blue-700 rounded text-sm"
+                  className="px-3 py-2 bg-primary-50 text-primary-700 rounded text-sm"
                 >
                   {permission.name}
                 </div>

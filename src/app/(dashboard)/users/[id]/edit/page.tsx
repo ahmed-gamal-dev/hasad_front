@@ -190,7 +190,7 @@ export default function EditUserPage({ params }: UserEditPageProps) {
   if (isFetchingUser || userId === null) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       </div>
     );
   }
@@ -202,7 +202,7 @@ export default function EditUserPage({ params }: UserEditPageProps) {
         <div>
           <button
             onClick={() => router.push('/users')}
-            className="text-blue-600 hover:text-blue-700 mb-2 flex items-center gap-2"
+            className="text-primary-600 hover:text-primary-700 mb-2 flex items-center gap-2"
           >
             <svg
               className="w-5 h-5"
@@ -248,7 +248,7 @@ export default function EditUserPage({ params }: UserEditPageProps) {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${
                   errors.name ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="Enter user name"
@@ -272,7 +272,7 @@ export default function EditUserPage({ params }: UserEditPageProps) {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${
                   errors.email ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="user@example.com"
@@ -295,7 +295,7 @@ export default function EditUserPage({ params }: UserEditPageProps) {
                 name="role"
                 value={formData.role}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${
                   errors.role ? 'border-red-500' : 'border-gray-300'
                 }`}
               >
@@ -334,7 +334,7 @@ export default function EditUserPage({ params }: UserEditPageProps) {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${
                   errors.password ? 'border-red-500' : 'border-gray-300'
                 }`}
                 placeholder="Leave blank to keep current"
@@ -363,7 +363,7 @@ export default function EditUserPage({ params }: UserEditPageProps) {
                 name="password_confirmation"
                 value={formData.password_confirmation}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${
                   errors.password_confirmation
                     ? 'border-red-500'
                     : 'border-gray-300'
@@ -392,7 +392,7 @@ export default function EditUserPage({ params }: UserEditPageProps) {
           <button
             type="submit"
             disabled={isLoading}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:bg-primary-400 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isLoading && (
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

@@ -1,8 +1,5 @@
-
-import '../styles/globals.css'
-import { AuthProvider } from '@/contexts/AuthContext';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import '../styles/globals.css';
+import Providers from './providers';
 
 export const metadata = {
   title: 'FieldOps HQ',
@@ -17,20 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
-          {children}
-          <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
-        </AuthProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
