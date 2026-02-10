@@ -58,7 +58,7 @@ export default function Sidebar() {
           <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold">F</span>
           </div>
-          <span className="font-semibold text-lg">FieldOps HQ</span>
+          <span className="font-semibold text-lg text-secondary-600">FieldOps HQ</span>
         </div>
       </div>
 
