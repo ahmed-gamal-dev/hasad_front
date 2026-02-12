@@ -36,6 +36,31 @@ export default function DashboardPage() {
           AI-prioritized reports needing immediate supervisor review
         </p>
       </div>
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          Reports Pending Approval
+        </h2>
+        <p className="text-sm text-gray-600">
+          AI-prioritized reports needing immediate supervisor review
+        </p>
+      </div>
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          Reports Pending Approval
+        </h2>
+        <p className="text-sm text-gray-600">
+          AI-prioritized reports needing immediate supervisor review
+        </p>
+      </div>
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          Reports Pending Approval
+        </h2>
+        <p className="text-sm text-gray-600">
+          AI-prioritized reports needing immediate supervisor review
+        </p>
+      </div>
+      
     </div>
   );
 }
