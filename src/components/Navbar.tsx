@@ -9,7 +9,10 @@ export default function Navbar() {
         {/* Language Selector */}
         <div className="flex items-center gap-2">
           <span className="text-2xl">🌐</span>
-          <select className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500">
+          <select 
+            suppressHydrationWarning
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+          >
             <option value="en">English</option>
             <option value="ar">Arabic</option>
             <option value="es">Spanish</option>
@@ -18,7 +21,6 @@ export default function Navbar() {
 
         {/* User Profile */}
         <div className="flex items-center gap-3">
-          
           <Usermenu/>
         </div>
       </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
@@ -38,6 +38,11 @@ const menuItems: MenuItem[] = [
     href: '/customers',
     icon: Users,
   },
+   {
+    name: 'Vehicles',
+    href: '/vehicles',
+    icon: Users,
+  },
   {
     name: 'Workers',
     href: '/workers',
@@ -69,9 +74,9 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-72 bg-white min-h-screen flex flex-col shadow-lg ">
+    <aside className="w-72 bg-white flex flex-col shadow-lg h-full">
       {/* Logo Section */}
-      <div className="px-6 py-4 border-b border-primary-100">
+      <div className="px-6 py-4 border-b border-primary-100 flex-shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20">
             <span className="text-white font-bold text-xl">F</span>
@@ -82,8 +87,8 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Navigation Menu */}
-      <nav className="flex-1 px-4 py-6 border-r border-primary-100 overflow-y-auto">
+      {/* Navigation Menu - NO OVERFLOW */}
+      <nav className="flex-1 px-4 py-6 border-r border-primary-100">
         <div className="space-y-1">
           {menuItems.map((item) => {
             const isActive = pathname === item.href;
@@ -118,8 +123,8 @@ export default function Sidebar() {
         </div>
       </nav>
 
-      {/* Help Section */}
-      <div className="p-4 border-t  border-r border-primary-100">
+      {/* Help Section - WITH suppressHydrationWarning */}
+      <div className="p-4 border-t border-r border-primary-100 flex-shrink-0">
         <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl p-5 border border-primary-200">
           <div className="flex items-start gap-3 mb-3">
             <div className="w-9 h-9 bg-primary-100 rounded-lg flex items-center justify-center">
@@ -132,7 +137,12 @@ export default function Sidebar() {
               </p>
             </div>
           </div>
-          <button className="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium py-2.5 px-4 rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-md shadow-primary-500/20 hover:shadow-primary-500/30 hover:scale-[1.02]">
+          <button 
+            type="button"
+            suppressHydrationWarning
+            onClick={() => console.log('Contact support')}
+            className="w-full bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-medium py-2.5 px-4 rounded-lg hover:from-primary-600 hover:to-primary-700 transition-all duration-200 shadow-md shadow-primary-500/20 hover:shadow-primary-500/30 hover:scale-[1.02]"
+          >
             Contact Support
           </button>
         </div>
