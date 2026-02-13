@@ -3,9 +3,10 @@ export interface User {
   name: string;
   email: string;
   email_verified_at?: string | null;
+  role?: string; // Added: API returns role as a string (admin, worker, supervisor, client)
   created_at?: string;
   updated_at?: string;
-  roles?: Role[];
+  roles?: Role[]; // Keep for backward compatibility
   permissions?: Permission[];
 }
 
@@ -21,12 +22,18 @@ export interface Permission {
   guard_name: string;
 }
 
-// API Response structure based on the documentation
+// API Response structure for paginated users list
 export interface UsersResponse {
   success: boolean;
   message: string;
-  data: {
-    users: User[];  // Users are nested inside data.users
+  data: User[]; // Updated: API returns users array directly in data
+  meta: {
+    pagination: {
+      current_page: number;
+      last_page: number;
+      per_page: number;
+      total: number;
+    };
   };
   errors: null | any;
 }
@@ -34,7 +41,7 @@ export interface UsersResponse {
 export interface UserResponse {
   success: boolean;
   message: string;
-  data: User;  // Single user is directly in data
+  data: User; // Single user is directly in data
   errors: null | any;
 }
 
@@ -44,7 +51,7 @@ export interface CreateUserRequest {
   email: string;
   password: string;
   password_confirmation: string;
-  role: string;  // Changed from role_ids to role (string like "Worker", "Admin", "Technician")
+  role: string; // Role as string like "worker", "admin", "supervisor", "client"
 }
 
 export interface UpdateUserRequest {
@@ -52,5 +59,28 @@ export interface UpdateUserRequest {
   email?: string;
   password?: string;
   password_confirmation?: string;
-  role?: string;  // Changed from role_ids to role (string like "Worker", "Admin", "Technician")
+  role?: string; // Role as string like "worker", "admin", "supervisor", "client"
+}
+
+// Pagination types
+export interface PaginationMeta {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+}
+
+export interface GetUsersParams {
+  page?: number;
+  per_page?: number;
+  q?: string;
+  sort?: string;
+}
+
+export interface PaginatedUsersResponse {
+  users: User[];
+  total: number;
+  currentPage: number;
+  lastPage: number;
+  perPage: number;
 }

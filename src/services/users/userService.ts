@@ -36,19 +36,58 @@ const getErrorMessage = (error: unknown) => {
   return "Something went wrong";
 };
 
+export interface PaginatedUsersResponse {
+  users: User[];
+  total: number;
+  currentPage: number;
+  lastPage: number;
+  perPage: number;
+}
+
+export interface GetUsersParams {
+  page?: number;
+  per_page?: number;
+  q?: string;
+  sort?: string;
+}
+
 export const userService = {
-  // Get all users
-  async getAll(): Promise<User[]> {
+  // Get all users with pagination
+  async getAll(params?: GetUsersParams): Promise<PaginatedUsersResponse> {
     try {
-      const response = await axiosInstance.get<UsersResponse>(
-        userEndpoints.list
+      const response = await axiosInstance.get<any>(
+        userEndpoints.list,
+        { params }
       );
       
       console.log('Users API Response:', response.data);
       
-      // Based on the API documentation, the response structure is:
-      // { success: true, message: "...", data: { users: [...] }, errors: null }
-      return response.data.data?.users || [];
+      // Based on the actual API response structure:
+      // {
+      //   success: true,
+      //   data: [...users array],
+      //   meta: {
+      //     pagination: {
+      //       current_page: 1,
+      //       last_page: 2,
+      //       per_page: 10,
+      //       total: 13
+      //     }
+      //   },
+      //   message: "Users fetched successfully.",
+      //   errors: null
+      // }
+      
+      const users = response.data.data || [];
+      const pagination = response.data.meta?.pagination || {};
+      
+      return {
+        users: users,
+        total: pagination.total || 0,
+        currentPage: pagination.current_page || 1,
+        lastPage: pagination.last_page || 1,
+        perPage: pagination.per_page || 15,
+      };
     } catch (error) {
       console.error('Error fetching users:', error);
       toast.error(getErrorMessage(error));
@@ -67,7 +106,7 @@ export const userService = {
       
       // Based on the API documentation, the response structure is:
       // { success: true, message: "...", data: { user: {...} }, errors: null }
-      return response.data.data.user;
+      return response.data.data;
     } catch (error) {
       console.error('Error fetching user:', error);
       toast.error(getErrorMessage(error));
@@ -79,13 +118,16 @@ export const userService = {
   async create(data: CreateUserRequest): Promise<User> {
     try {
       // According to the API documentation, the request body should be:
-      // { name, email, password, role }
+      // { name, email, password, password_confirmation, role }
       const requestData = {
         name: data.name,
         email: data.email,
         password: data.password,
+        password_confirmation: data.password_confirmation,
         role: data.role || "Worker" // Default role if not provided
       };
+
+      console.log('Creating user with data:', requestData);
 
       const response = await axiosInstance.post<UserResponse>(
         userEndpoints.create,
@@ -104,6 +146,10 @@ export const userService = {
       return response.data.data;
     } catch (error) {
       console.error('Error creating user:', error);
+      if (error instanceof AxiosError) {
+        console.error('Response data:', error.response?.data);
+        console.error('Request data:', error.config?.data);
+      }
       const errorMessage = getErrorMessage(error);
       toast.error(errorMessage);
       throw error;
@@ -114,16 +160,17 @@ export const userService = {
   async update(id: number, data: UpdateUserRequest): Promise<User> {
     try {
       // According to the API documentation, the request body should be:
-      // { name, email, password (optional), role }
+      // { name, email, password (optional), password_confirmation (optional), role }
       const requestData: any = {
         name: data.name,
         email: data.email,
         role: data.role || "Worker"
       };
 
-      // Only include password if it's provided
+      // Only include password and password_confirmation if password is provided
       if (data.password) {
         requestData.password = data.password;
+        requestData.password_confirmation = data.password_confirmation;
       }
 
       const response = await axiosInstance.put<UserResponse>(
@@ -161,6 +208,22 @@ export const userService = {
       }
     } catch (error) {
       console.error('Error deleting user:', error);
+      toast.error(getErrorMessage(error));
+      throw error;
+    }
+  },
+
+  // Export users to CSV
+  async exportCsv(): Promise<Blob> {
+    try {
+      const response = await axiosInstance.get(userEndpoints.exportCsv, {
+        responseType: 'blob'
+      });
+      
+      toast.success("Users exported successfully");
+      return response.data;
+    } catch (error) {
+      console.error('Error exporting users:', error);
       toast.error(getErrorMessage(error));
       throw error;
     }
