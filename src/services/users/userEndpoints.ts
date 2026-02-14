@@ -1,9 +1,10 @@
-export const userEndpoints = {
+const userEndpoints = {
   list: '/users',
-  detail: (id: number) => `/users/${id}`,
   create: '/users',
+  detail: (id: number) => `/users/${id}`,
   update: (id: number) => `/users/${id}`,
   delete: (id: number) => `/users/${id}`,
+  exportCsv: '/users/export/csv',
 };
 
 export default userEndpoints;

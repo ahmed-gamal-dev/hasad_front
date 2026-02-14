@@ -245,30 +245,29 @@ export default function LoginPage() {
               </button>
             </form>
 
-            {/* Divider */}
-            <div className="relative my-6">
+            {/* <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-200"></div>
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="px-4 bg-white text-gray-500">Need an account?</span>
               </div>
-            </div>
+            </div> */}
 
             {/* Sign Up Link */}
-            <div className="text-center">
+            {/* <div className="text-center">
               <a 
                 href="/signup" 
                 className="text-primary-600 hover:text-primary-700 font-semibold hover:underline transition-colors"
               >
                 Create new account
               </a>
-            </div>
+            </div> */}
           </div>
 
           {/* Footer */}
           <div className="mt-8 text-center text-sm text-gray-500">
-            <p>©  FieldOps HQ. All rights reserved.</p>
+            <p>©2026  FieldOps HQ. All rights reserved.</p>
           </div>
         </div>
       </div>

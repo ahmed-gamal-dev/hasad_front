@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Pagination, { PaginationProps } from './Pagination';
 
 export interface Column<T> {
   key: string;
@@ -17,6 +18,8 @@ interface DataTableProps<T> {
   onView?: (item: T) => void;
   isLoading?: boolean;
   emptyMessage?: string;
+  pagination?: PaginationProps; // Changed from Omit to include totalItems
+  showPagination?: boolean;
 }
 
 export default function DataTable<T extends { id: number | string }>({
@@ -27,6 +30,8 @@ export default function DataTable<T extends { id: number | string }>({
   onView,
   isLoading = false,
   emptyMessage = 'No data available',
+  pagination,
+  showPagination = false,
 }: DataTableProps<T>) {
   if (isLoading) {
     return (
@@ -72,7 +77,7 @@ export default function DataTable<T extends { id: number | string }>({
           </thead>
           <tbody className="divide-y divide-gray-200">
             {data.map((item, index) => (
-              <tr key={item.id} className="hover:bg-primary-50 transition-colors">
+              <tr key={item.id} className="hover:bg-primary-50 border-b border-gray-200 transition-colors">
                 {columns.map((column) => (
                   <td key={column.key} className="px-6 py-4 whitespace-nowrap">
                     {column.render
@@ -159,7 +164,13 @@ export default function DataTable<T extends { id: number | string }>({
             ))}
           </tbody>
         </table>
+         {/* Pagination */}
+      {showPagination && pagination && (
+        <Pagination {...pagination} />
+      )}
       </div>
+
+     
     </div>
   );
 }
