@@ -44,6 +44,11 @@ const menuItems: MenuItem[] = [
     icon: Users,
   },
   {
+    name: 'Clients',
+    href: '/clients',
+    icon: Users,
+  },
+  {
     name: 'Workers',
     href: '/workers',
     icon: Briefcase,
