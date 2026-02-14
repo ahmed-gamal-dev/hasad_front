@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { User } from '@/types/user';
 import { userService } from '@/services/users/userService';
 import DataTable, { Column } from '@/components/shared/DataTable';
+import { confirmDeleteAlert } from '@/components/shared/confirmAlert';
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -30,14 +31,18 @@ export default function UsersPage() {
   };
 
   const handleDelete = async (user: User) => {
-    if (window.confirm(`Are you sure you want to delete ${user.name}?`)) {
-      try {
-        await userService.delete(user.id);
-        // Refresh the list after delete
-        fetchUsers();
-      } catch (error) {
-        console.error('Error deleting user:', error);
-      }
+    const isConfirmed = await confirmDeleteAlert({ entityName: user.name });
+
+    if (!isConfirmed) {
+      return;
+    }
+
+    try {
+      await userService.delete(user.id);
+      // Refresh the list after delete
+      fetchUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
     }
   };
 
@@ -140,7 +145,7 @@ export default function UsersPage() {
               placeholder="Search users..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
         </div>

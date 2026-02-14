@@ -33,7 +33,7 @@ const formatReportedAt = (reportedAt?: string): string => {
   return date.toLocaleString();
 };
 
-export default function ServiceReportPage() {
+export default function PendingApprovalReportsPage() {
   const [reports, setReports] = useState<ServiceReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -46,10 +46,10 @@ export default function ServiceReportPage() {
   const fetchReports = async () => {
     try {
       setIsLoading(true);
-      const data = await reportService.getAll();
+      const data = await reportService.getPendingApproval();
       setReports(data);
     } catch (error) {
-      console.error('Error fetching reports:', error);
+      console.error('Error fetching pending approval reports:', error);
     } finally {
       setIsLoading(false);
     }
@@ -62,7 +62,6 @@ export default function ServiceReportPage() {
       firstValue(report, ['assigned_user_name'], ''),
       firstValue(report, ['service_location'], ''),
       firstValue(report, ['status'], ''),
-      firstValue(report, ['company_phone'], ''),
       firstValue(report, ['reported_at'], ''),
     ]
       .join(' ')
@@ -109,17 +108,10 @@ export default function ServiceReportPage() {
       ),
     },
     {
-      key: 'rating',
-      label: 'Rating',
-      render: (report) => (
-        <div className="text-sm text-gray-600">{firstValue(report, ['rating'])}</div>
-      ),
-    },
-    {
       key: 'status',
       label: 'Status',
       render: (report) => (
-        <div className="text-sm text-gray-600 capitalize">
+        <div className="text-sm text-amber-700 capitalize">
           {firstValue(report, ['status']).replaceAll('_', ' ')}
         </div>
       ),
@@ -143,16 +135,18 @@ export default function ServiceReportPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Service Reports</h1>
-          <p className="text-gray-600 text-xs mt-1">View all service reports</p>
+          <h1 className="text-2xl font-bold text-gray-900">Pending Approval Queue</h1>
+          <p className="text-gray-600 text-xs mt-1">
+            Reports waiting for supervisor approval
+          </p>
         </div>
         <button
-          onClick={() => router.push('/service-report/pending-approval')}
+          onClick={() => router.push('/service-report')}
           className="bg-white text-primary-700 border border-primary-300 px-4 py-2 rounded-lg hover:bg-primary-50 transition-colors"
         >
-          Pending Approval Queue
+          View All Reports
         </button>
       </div>
 
@@ -161,7 +155,7 @@ export default function ServiceReportPage() {
           <div className="flex-1">
             <input
               type="text"
-              placeholder="Search reports..."
+              placeholder="Search pending reports..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
@@ -175,7 +169,7 @@ export default function ServiceReportPage() {
         data={filteredReports}
         onView={handleView}
         isLoading={isLoading}
-        emptyMessage="No service reports found"
+        emptyMessage="No reports are pending approval"
       />
     </div>
   );

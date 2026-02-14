@@ -44,7 +44,7 @@
   --color-gray-50: #f8f9fa;
   --color-gray-100: #f1f3f5;
   --color-gray-200: #e4e7eb;
-  --color-gray-300: #d0d5db;
+  --color-gray-400: #d0d5db;
   --color-gray-400: #9ba3ae;
   --color-gray-500: #6c7580;
   --color-gray-600: #4f5864;
@@ -69,4 +69,15 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+input,
+textarea,
+select {
+  color: var(--color-gray-400);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-gray-400);
 }

@@ -249,7 +249,7 @@ export default function EditUserPage({ params }: UserEditPageProps) {
                 value={formData.name}
                 onChange={handleChange}
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${
-                  errors.name ? 'border-red-500' : 'border-gray-300'
+                  errors.name ? 'border-red-500' : 'border-gray-400'
                 }`}
                 placeholder="Enter user name"
               />
@@ -273,7 +273,7 @@ export default function EditUserPage({ params }: UserEditPageProps) {
                 value={formData.email}
                 onChange={handleChange}
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${
-                  errors.email ? 'border-red-500' : 'border-gray-300'
+                  errors.email ? 'border-red-500' : 'border-gray-400'
                 }`}
                 placeholder="user@example.com"
               />
@@ -296,7 +296,7 @@ export default function EditUserPage({ params }: UserEditPageProps) {
                 value={formData.role}
                 onChange={handleChange}
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${
-                  errors.role ? 'border-red-500' : 'border-gray-300'
+                  errors.role ? 'border-red-500' : 'border-gray-400'
                 }`}
               >
                 {availableRoles.map((role) => (
@@ -335,7 +335,7 @@ export default function EditUserPage({ params }: UserEditPageProps) {
                 value={formData.password}
                 onChange={handleChange}
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${
-                  errors.password ? 'border-red-500' : 'border-gray-300'
+                  errors.password ? 'border-red-500' : 'border-gray-400'
                 }`}
                 placeholder="Leave blank to keep current"
               />
@@ -366,7 +366,7 @@ export default function EditUserPage({ params }: UserEditPageProps) {
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 ${
                   errors.password_confirmation
                     ? 'border-red-500'
-                    : 'border-gray-300'
+                    : 'border-gray-400'
                 }`}
                 placeholder="Leave blank to keep current"
               />
@@ -384,7 +384,7 @@ export default function EditUserPage({ params }: UserEditPageProps) {
           <button
             type="button"
             onClick={() => router.push('/users')}
-            className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            className="px-6 py-2 border border-gray-400 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
             disabled={isLoading}
           >
             Cancel
