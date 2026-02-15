@@ -8,6 +8,8 @@ import {
   ClientResponse,
   CreateClientRequest,
   UpdateClientRequest,
+  GetClientsParams,
+  PaginatedClientsResponse,
 } from '@/types/client';
 
 const getErrorMessage = (error: unknown) => {
@@ -28,24 +30,41 @@ const getErrorMessage = (error: unknown) => {
 
 export const clientService = {
   async getAll(): Promise<Client[]> {
+    const response = await clientService.getAllPaginated();
+    return response.clients;
+  },
+
+  async getAllPaginated(params?: GetClientsParams): Promise<PaginatedClientsResponse> {
     try {
       const response = await axiosInstance.get<ClientsResponse>(
-        clientEndpoints.list
+        clientEndpoints.list,
+        { params }
       );
 
-      if (Array.isArray(response.data.data?.clients)) {
-        return response.data.data.clients;
+      const pagination = response.data.meta?.pagination || {};
+      let clients: Client[] = [];
+      const responseData = response.data.data;
+
+      if (responseData && !Array.isArray(responseData) && Array.isArray(responseData.clients)) {
+        clients = responseData.clients;
+      } else if (Array.isArray(response.data.clients)) {
+        clients = response.data.clients;
+      } else if (Array.isArray(responseData)) {
+        clients = responseData as unknown as Client[];
       }
 
-      if (Array.isArray(response.data.clients)) {
-        return response.data.clients;
-      }
+      const fallbackTotal = clients.length;
+      const perPage = pagination.per_page || params?.per_page || fallbackTotal || 15;
 
-      if (Array.isArray(response.data.data)) {
-        return response.data.data as unknown as Client[];
-      }
-
-      return [];
+      return {
+        clients,
+        total: pagination.total || fallbackTotal,
+        currentPage: pagination.current_page || params?.page || 1,
+        lastPage:
+          pagination.last_page ||
+          (fallbackTotal > 0 ? Math.ceil((pagination.total || fallbackTotal) / perPage) : 1),
+        perPage,
+      };
     } catch (error) {
       console.error('Error fetching clients:', error);
       toast.error(getErrorMessage(error));
