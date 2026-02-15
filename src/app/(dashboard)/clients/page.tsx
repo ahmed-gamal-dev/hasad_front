@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/shared/DataTable';
 import { confirmDeleteAlert } from '@/components/shared/confirmAlert';
@@ -12,23 +12,33 @@ export default function ClientsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(15);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const router = useRouter();
 
-  useEffect(() => {
-    fetchClients();
-  }, []);
-
-  const fetchClients = async () => {
+  const fetchClients = useCallback(async () => {
     try {
       setIsLoading(true);
-      const data = await clientService.getAll();
-      setClients(data);
+      const data = await clientService.getAllPaginated({
+        page: currentPage,
+        per_page: itemsPerPage,
+        q: searchTerm || undefined,
+      });
+      setClients(data.clients);
+      setTotalPages(data.lastPage);
+      setTotalItems(data.total);
     } catch (error) {
       console.error('Error fetching clients:', error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, itemsPerPage, searchTerm]);
+
+  useEffect(() => {
+    fetchClients();
+  }, [fetchClients]);
 
   const handleView = (client: Client) => {
     router.push(`/clients/${client.id}`);
@@ -48,7 +58,11 @@ export default function ClientsPage() {
 
     try {
       await clientService.delete(client.id);
-      fetchClients();
+      if (clients.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      } else {
+        fetchClients();
+      }
     } catch (error) {
       console.error('Error deleting client:', error);
     }
@@ -65,19 +79,20 @@ export default function ClientsPage() {
     }
   };
 
-  const filteredClients = clients.filter((client) => {
-    const searchable = [
-      client.name,
-      client.company_name,
-      client.email,
-      client.phone,
-    ]
-      .filter(Boolean)
-      .join(' ')
-      .toLowerCase();
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-    return searchable.includes(searchTerm.toLowerCase());
-  });
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
 
   const columns: Column<Client>[] = [
     {
@@ -160,7 +175,7 @@ export default function ClientsPage() {
               type="text"
               placeholder="Search clients..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="w-full px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
@@ -169,12 +184,23 @@ export default function ClientsPage() {
 
       <DataTable
         columns={columns}
-        data={filteredClients}
+        data={clients}
         onEdit={handleEdit}
         onView={handleView}
         onDelete={handleDelete}
         isLoading={isLoading}
         emptyMessage="No clients found"
+        showPagination={true}
+        pagination={{
+          currentPage,
+          totalPages,
+          itemsPerPage,
+          totalItems,
+          onPageChange: handlePageChange,
+          onItemsPerPageChange: handleItemsPerPageChange,
+          itemsPerPageOptions: [10, 15, 25, 50, 100],
+          showItemsPerPage: true,
+        }}
       />
     </div>
   );

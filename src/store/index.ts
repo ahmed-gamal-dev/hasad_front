@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
+import clientsReducer from './slices/clientsSlice';
 import Cookies from 'js-cookie';
 
 // Rehydrate auth state from cookies before store creation
@@ -35,8 +36,9 @@ if (typeof window !== 'undefined') {
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    clients: clientsReducer,
   },
-  preloadedState, // ✅ Load saved state immediately
+  preloadedState,
 });
 
 export type RootState = ReturnType<typeof store.getState>;

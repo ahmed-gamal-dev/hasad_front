@@ -19,6 +19,14 @@ export interface ClientsResponse {
   message?: string;
   data?: {
     clients?: Client[];
+  } | Client[];
+  meta?: {
+    pagination?: {
+      current_page?: number;
+      last_page?: number;
+      per_page?: number;
+      total?: number;
+    };
   };
   clients?: Client[];
   errors?: null | unknown;
@@ -54,4 +62,19 @@ export interface UpdateClientRequest {
   state?: string;
   zip_code?: string;
   notes?: string;
+}
+
+export interface GetClientsParams {
+  page?: number;
+  per_page?: number;
+  q?: string;
+  sort?: string;
+}
+
+export interface PaginatedClientsResponse {
+  clients: Client[];
+  total: number;
+  currentPage: number;
+  lastPage: number;
+  perPage: number;
 }
