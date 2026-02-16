@@ -8,6 +8,7 @@ import { workerService } from '@/services/workers/workerService';
 import { Worker } from '@/types/worker';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { setClients as setClientsInStore } from '@/store/slices/clientsSlice';
+import { useTranslation } from '@/contexts/SimpleTranslationContext';
 
 interface VisitEvent {
   id: number;
@@ -88,6 +89,7 @@ export default function SchedulePage() {
     notes: '',
   });
   const [errors, setErrors] = useState<FormErrors>({});
+  const { translate, language, setLanguage } = useTranslation();
 
   // Fetch visits for calendar
   useEffect(() => {
@@ -360,8 +362,8 @@ export default function SchedulePage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Schedule</h1>
-          <p className="text-gray-600 mt-2 text-xs px-2 ">View, manage, and create visit schedules</p>
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{translate('Schedule')}</h1>
+          <p className="text-gray-600 mt-2 text-xs px-2 ">{translate('View, manage, and create visit schedules')}</p>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
@@ -375,28 +377,29 @@ export default function SchedulePage() {
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Add Visit
+         {translate('Add Visit')} 
         </button>
       </div>
   <div className="px-6   ">
           <div className="flex items-center gap-6">
-            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Legend:</span>
+            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">          {translate('Schedule Key:')} 
+</span>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-primary-500 rounded border-l-4 border-l-primary-600 shadow-sm"></div>
-                <span className="text-sm font-medium text-gray-700">Scheduled</span>
+                <span className="text-sm font-medium text-gray-700">  {translate('Scheduled:')} </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-secondary-500 rounded border-l-4 border-l-secondary-600 shadow-sm"></div>
-                <span className="text-sm font-medium text-gray-700">In Progress</span>
+                <span className="text-sm font-medium text-gray-700"> {translate('In Progress')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-emerald-600 rounded border-l-4 border-l-emerald-700 shadow-sm"></div>
-                <span className="text-sm font-medium text-gray-700">Completed</span>
+                <span className="text-sm font-medium text-gray-700">{translate('Completed')} </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-gray-500 rounded border-l-4 border-l-gray-600 shadow-sm"></div>
-                <span className="text-sm font-medium text-gray-700">Cancelled</span>
+                <span className="text-sm font-medium text-gray-700">{translate('Cancelled')}</span>
               </div>
             </div>
           </div>
@@ -428,12 +431,12 @@ export default function SchedulePage() {
               onClick={goToToday}
               className="px-4 py-2 bg-white border border-gray-300 hover:border-primary-500 hover:bg-primary-50 rounded-lg transition-all duration-200 font-medium text-sm text-gray-700 hover:text-primary-700 shadow-sm"
             >
-              Today
+              {translate('Today')}
             </button>
           </div>
 
           <h2 className="text-xl font-bold text-gray-900 tracking-tight">
-            {MONTHS[currentDate.getMonth()]} {currentDate.getFullYear()}
+{translate(MONTHS[currentDate.getMonth()])} {currentDate.getFullYear()}
           </h2>
 
           <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1.5 shadow-inner">
@@ -445,7 +448,7 @@ export default function SchedulePage() {
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
-              Month
+              {translate('Month')}
             </button>
             <button
               onClick={() => setViewMode('week')}
@@ -455,7 +458,7 @@ export default function SchedulePage() {
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
-              Week
+              {translate('Week')}
             </button>
             <button
               onClick={() => setViewMode('day')}
@@ -465,7 +468,7 @@ export default function SchedulePage() {
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
-              Day
+             {translate('Day')} 
             </button>
           </div>
         </div>
