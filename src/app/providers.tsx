@@ -3,11 +3,15 @@
 import { ReactNode } from 'react';
 import { ReduxProvider } from '@/store/ReduxProvider';
 import { ToastContainer } from 'react-toastify';
+import { SimpleTranslationProvider } from '@/contexts/SimpleTranslationContext';
+
 import 'react-toastify/dist/ReactToastify.css';
 
 export default function Providers({ children }: { children: ReactNode }) {
   return (
     <ReduxProvider>
+      <SimpleTranslationProvider>
+
       {children}
       <ToastContainer
         position="top-right"
@@ -20,6 +24,7 @@ export default function Providers({ children }: { children: ReactNode }) {
         draggable
         pauseOnHover
       />
+      </SimpleTranslationProvider>
     </ReduxProvider>
   );
 }
