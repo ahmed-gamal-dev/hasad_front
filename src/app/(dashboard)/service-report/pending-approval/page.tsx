@@ -36,6 +36,7 @@ const formatReportedAt = (reportedAt?: string): string => {
 export default function PendingApprovalReportsPage() {
   const [reports, setReports] = useState<ServiceReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [approvingReportId, setApprovingReportId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
 
@@ -126,6 +127,39 @@ export default function PendingApprovalReportsPage() {
           )}
         </div>
       ),
+    },
+    {
+      key: 'approve',
+      label: 'Approve',
+      render: (report) => {
+        const reportId = Number(report.id);
+        const isApproving = approvingReportId === reportId;
+
+        return (
+          <button
+            type="button"
+            onClick={async () => {
+              if (Number.isNaN(reportId)) {
+                return;
+              }
+
+              try {
+                setApprovingReportId(reportId);
+                await reportService.approve(reportId);
+                await fetchReports();
+              } catch (error) {
+                console.error('Error approving pending report:', error);
+              } finally {
+                setApprovingReportId(null);
+              }
+            }}
+            disabled={isApproving}
+            className="px-3 py-1.5 text-xs rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isApproving ? 'Approving...' : 'Approve'}
+          </button>
+        );
+      },
     },
   ];
 

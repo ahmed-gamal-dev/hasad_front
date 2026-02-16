@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
+import { promptRejectReasonAlert } from '@/components/shared/promptInputAlert';
 import { reportService } from '@/services/reports/reportService';
 import { ServiceReport } from '@/types/report';
 
@@ -32,6 +33,8 @@ const statusText = (status?: string) => {
   return status.replaceAll('_', ' ');
 };
 
+const normalizedStatus = (status?: string) => (status || '').trim().toLowerCase();
+
 export default function ServiceReportDetailsPage({
   params,
 }: ServiceReportDetailsPageProps) {
@@ -39,6 +42,9 @@ export default function ServiceReportDetailsPage({
   const [reportId, setReportId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isApproving, setIsApproving] = useState(false);
+  const [isRejecting, setIsRejecting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -92,6 +98,74 @@ export default function ServiceReportDetailsPage({
     }
   };
 
+  const handleApprove = async () => {
+    if (!report?.id) {
+      return;
+    }
+
+    try {
+      setIsApproving(true);
+      const approvedReport = await reportService.approve(report.id);
+
+      if (approvedReport && typeof approvedReport === 'object' && 'id' in approvedReport) {
+        setReport(approvedReport);
+      } else {
+        await fetchReport(report.id);
+      }
+    } catch (error) {
+      console.error('Error approving service report:', error);
+    } finally {
+      setIsApproving(false);
+    }
+  };
+
+  const handleSubmitReport = async () => {
+    if (!report?.id) {
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      const submittedReport = await reportService.submit(report.id);
+
+      if (submittedReport && typeof submittedReport === 'object' && 'id' in submittedReport) {
+        setReport(submittedReport);
+      } else {
+        await fetchReport(report.id);
+      }
+    } catch (error) {
+      console.error('Error submitting service report:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!report?.id) {
+      return;
+    }
+
+    const reason = await promptRejectReasonAlert();
+    if (!reason) {
+      return;
+    }
+
+    try {
+      setIsRejecting(true);
+      const rejectedReport = await reportService.reject(report.id, reason);
+
+      if (rejectedReport && typeof rejectedReport === 'object' && 'id' in rejectedReport) {
+        setReport(rejectedReport);
+      } else {
+        await fetchReport(report.id);
+      }
+    } catch (error) {
+      console.error('Error rejecting service report:', error);
+    } finally {
+      setIsRejecting(false);
+    }
+  };
+
   if (isLoading || reportId === null) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -107,6 +181,10 @@ export default function ServiceReportDetailsPage({
       </div>
     );
   }
+
+  const isApproved = normalizedStatus(report.status) === 'approved';
+  const isRejected = normalizedStatus(report.status) === 'rejected';
+  const isSubmitted = normalizedStatus(report.status) === 'submitted';
 
   return (
     <div className="space-y-6">
@@ -134,13 +212,36 @@ export default function ServiceReportDetailsPage({
           <h1 className="text-2xl font-bold text-gray-900">Service Report #{report.id}</h1>
           <p className="text-gray-600 mt-1">{report.client_name || '-'}</p>
         </div>
-        <button
-          onClick={handleDownloadPdf}
-          disabled={isDownloadingPdf}
-          className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors disabled:bg-primary-400 disabled:cursor-not-allowed"
-        >
-          {isDownloadingPdf ? 'Opening...' : 'Open PDF'}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleSubmitReport}
+            disabled={isSubmitted || isSubmitting || isApproving || isRejecting}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-400 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit Report'}
+          </button>
+          <button
+            onClick={handleApprove}
+            disabled={isApproved || isSubmitting || isApproving || isRejecting}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-400 disabled:cursor-not-allowed"
+          >
+            {isApproving ? 'Approving...' : 'Approve Report'}
+          </button>
+          <button
+            onClick={handleReject}
+            disabled={isRejected || isSubmitting || isRejecting || isApproving}
+            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:bg-red-400 disabled:cursor-not-allowed"
+          >
+            {isRejecting ? 'Rejecting...' : 'Reject Report'}
+          </button>
+          <button
+            onClick={handleDownloadPdf}
+            disabled={isDownloadingPdf}
+            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors disabled:bg-primary-400 disabled:cursor-not-allowed"
+          >
+            {isDownloadingPdf ? 'Opening...' : 'Open PDF'}
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

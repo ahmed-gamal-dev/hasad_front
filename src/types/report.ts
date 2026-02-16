@@ -24,6 +24,26 @@ export interface ServiceReport {
   [key: string]: unknown;
 }
 
+export interface CreateReportRequest {
+  client_id: number;
+  visit_id?: number | '' | null;
+  assigned_user_id?: number | '' | null;
+  reported_at: string;
+  service_location: string;
+  lat?: number | '' | null;
+  lng?: number | '' | null;
+  service_types: string[];
+  observations: string[];
+  description: string;
+  actions_taken: string;
+  recommendations?: string | null;
+  rating?: number | '' | null;
+  company_phone?: string | null;
+  company_signature?: string | null;
+  worker_signature?: string | null;
+  images?: Array<File | Blob | string>;
+}
+
 export interface ReportsPagination {
   current_page: number;
   last_page: number;
