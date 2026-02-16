@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import DataTable, { Column } from '@/components/shared/DataTable';
+import { promptRejectReasonAlert } from '@/components/shared/promptInputAlert';
 import { reportService } from '@/services/reports/reportService';
 import { ServiceReport } from '@/types/report';
 
@@ -33,10 +34,17 @@ const formatReportedAt = (reportedAt?: string): string => {
   return date.toLocaleString();
 };
 
+const normalizedStatus = (status?: string) => (status || '').trim().toLowerCase();
+
 export default function ServiceReportPage() {
   const [reports, setReports] = useState<ServiceReport[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [submittingReportId, setSubmittingReportId] = useState<number | null>(null);
+  const [approvingReportId, setApprovingReportId] = useState<number | null>(null);
+  const [rejectingReportId, setRejectingReportId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(15);
   const router = useRouter();
 
   useEffect(() => {
@@ -70,6 +78,29 @@ export default function ServiceReportPage() {
 
     return searchable.includes(searchTerm.toLowerCase());
   });
+
+  const totalItems = filteredReports.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const paginatedReports = filteredReports.slice(
+    (safeCurrentPage - 1) * itemsPerPage,
+    safeCurrentPage * itemsPerPage
+  );
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
 
   const columns: Column<ServiceReport>[] = [
     {
@@ -135,6 +166,125 @@ export default function ServiceReportPage() {
         </div>
       ),
     },
+    {
+      key: 'submit',
+      label: 'Submit',
+      render: (report) => {
+        const reportId = Number(report.id);
+        const isSubmitted = normalizedStatus(
+          typeof report.status === 'string' ? report.status : undefined
+        ) === 'submitted';
+        const isSubmitting = submittingReportId === reportId;
+        const isApproving = approvingReportId === reportId;
+        const isRejecting = rejectingReportId === reportId;
+
+        return (
+          <button
+            type="button"
+            disabled={isSubmitted || isSubmitting || isApproving || isRejecting}
+            onClick={async () => {
+              if (Number.isNaN(reportId)) {
+                return;
+              }
+
+              try {
+                setSubmittingReportId(reportId);
+                await reportService.submit(reportId);
+                await fetchReports();
+              } catch (error) {
+                console.error('Error submitting report from table:', error);
+              } finally {
+                setSubmittingReportId(null);
+              }
+            }}
+            className="bg-primary-600 text-white px-3 py-1.5 text-xs rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit'}
+          </button>
+        );
+      },
+    },
+    {
+      key: 'Approved',
+      label: 'Approve',
+      render: (report) => {
+        const reportId = Number(report.id);
+        const isSubmitting = submittingReportId === reportId;
+        const isApproving = approvingReportId === reportId;
+        const isRejecting = rejectingReportId === reportId;
+        const isApproved =
+          normalizedStatus(typeof report.status === 'string' ? report.status : undefined) ===
+          'approved';
+
+        return (
+          <button
+            type="button"
+            disabled={isApproved || isSubmitting || isApproving || isRejecting}
+            onClick={async () => {
+              if (Number.isNaN(reportId)) {
+                return;
+              }
+
+              try {
+                setApprovingReportId(reportId);
+                await reportService.approve(reportId);
+                await fetchReports();
+              } catch (error) {
+                console.error('Error approving report from table:', error);
+              } finally {
+                setApprovingReportId(null);
+              }
+            }}
+            className="px-3 py-1.5 text-xs rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isApproving ? 'Approving...' : 'Approve'}
+          </button>
+        );
+      },
+    },
+    {
+      key: 'reject',
+      label: 'Reject',
+      render: (report) => {
+        const reportId = Number(report.id);
+        const isSubmitting = submittingReportId === reportId;
+        const isApproving = approvingReportId === reportId;
+        const isRejecting = rejectingReportId === reportId;
+        const isRejected =
+          normalizedStatus(typeof report.status === 'string' ? report.status : undefined) ===
+          'rejected';
+
+        return (
+          <button
+            type="button"
+            disabled={isRejected || isSubmitting || isApproving || isRejecting}
+            onClick={async () => {
+              if (Number.isNaN(reportId)) {
+                return;
+              }
+
+              const reason = await promptRejectReasonAlert();
+              if (!reason) {
+                return;
+              }
+
+              try {
+                setRejectingReportId(reportId);
+                await reportService.reject(reportId, reason);
+                await fetchReports();
+              } catch (error) {
+                console.error('Error rejecting report from table:', error);
+              } finally {
+                setRejectingReportId(null);
+              }
+            }}
+            className="px-3 py-1.5 text-xs rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {isRejecting ? 'Rejecting...' : 'Reject'}
+          </button>
+        );
+      },
+    },
   ];
 
   const handleView = (report: ServiceReport) => {
@@ -148,12 +298,20 @@ export default function ServiceReportPage() {
           <h1 className="text-2xl font-bold text-gray-900">Service Reports</h1>
           <p className="text-gray-600 text-xs mt-1">View all service reports</p>
         </div>
-        <button
-          onClick={() => router.push('/service-report/pending-approval')}
-          className="bg-white text-primary-700 border border-primary-300 px-4 py-2 rounded-lg hover:bg-primary-50 transition-colors"
-        >
-          Pending Approval Queue
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => router.push('/service-report/new')}
+            className="bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors"
+          >
+            Create Report
+          </button>
+          <button
+            onClick={() => router.push('/service-report/pending-approval')}
+            className="bg-white text-primary-700 border border-primary-300 px-4 py-2 rounded-lg hover:bg-primary-50 transition-colors"
+          >
+            Pending Approval Queue
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -163,7 +321,7 @@ export default function ServiceReportPage() {
               type="text"
               placeholder="Search reports..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="w-full px-4 py-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
@@ -172,10 +330,21 @@ export default function ServiceReportPage() {
 
       <DataTable
         columns={columns}
-        data={filteredReports}
+        data={paginatedReports}
         onView={handleView}
         isLoading={isLoading}
         emptyMessage="No service reports found"
+        showPagination={true}
+        pagination={{
+          currentPage: safeCurrentPage,
+          totalPages,
+          itemsPerPage,
+          totalItems,
+          onPageChange: handlePageChange,
+          onItemsPerPageChange: handleItemsPerPageChange,
+          itemsPerPageOptions: [10, 15, 25, 50, 100],
+          showItemsPerPage: true,
+        }}
       />
     </div>
   );

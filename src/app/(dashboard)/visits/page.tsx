@@ -83,6 +83,16 @@ export default function VisitsPage() {
     }
   };
 
+  const handleCreateReport = (visit: Visit) => {
+    const params = new URLSearchParams({
+      client_id: String(visit.client_id),
+      visit_id: String(visit.id),
+      assigned_user_id: String(visit.assigned_user_id),
+    });
+
+    router.push(`/service-report/new?${params.toString()}`);
+  };
+
   const columns: Column<Visit>[] = [
     {
       key: 'client_id',
@@ -133,14 +143,23 @@ export default function VisitsPage() {
         const isBusy = isCompletingVisitId === visit.id;
 
         return (
-          <button
-            type="button"
-            onClick={() => handleCompleteVisit(visit)}
-            disabled={isCompleted || isBusy}
-            className="px-3 py-1.5 text-xs rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {isCompleted ? 'Completed' : isBusy ? 'Completing...' : 'Mark Completed'}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => handleCreateReport(visit)}
+              className="px-3 py-1.5 text-xs rounded-lg bg-primary-600 text-white hover:bg-primary-700"
+            >
+              Create Report
+            </button>
+            <button
+              type="button"
+              onClick={() => handleCompleteVisit(visit)}
+              disabled={isCompleted || isBusy}
+              className="px-3 py-1.5 text-xs rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isCompleted ? 'Completed' : isBusy ? 'Completing...' : 'Mark Completed'}
+            </button>
+          </div>
         );
       },
     },
